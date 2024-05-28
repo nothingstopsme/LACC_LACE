@@ -3,11 +3,16 @@ import numpy as np
 
 def process(Lab, block_size=25, epsilon=1e-2):
   '''
-  Lab: the input image in the CIEL*a*b* format.
+  Lab:
+  The input image in the CIEL*a*b* format.
 
-  block_size: the size of square blocks for calculating local statistics; this is also the size of the square kernel used for guilded image filtering.
+  block_size:
+  The size of square blocks for calculating local statistics;
+  this is also the size of the square kernel used for guilded image filtering.
 
-  epsilon: the parameter of guilded image filtering which controls the degree of local variances being preserved. Its value should be >= 0.0, and the larger it is, the stronger smoothing effect is produced.
+  epsilon:
+  The parameter of guilded image filtering which controls the degree of local variances being preserved.
+  Its value should be >= 0.0, and the larger it is, the stronger smoothing effect is produced.
   '''
 
   L = Lab[..., 0]
@@ -37,7 +42,8 @@ def process(Lab, block_size=25, epsilon=1e-2):
   global_var = np.var(L)
   ratio =  np.minimum(global_var / block_var, 2.0)
   
-  # for each pixel, the scale and offset are averaged over all blocks in which that pixel is involved, so its value in L_eb is equivalent to the average of all mapped pixel values computed from different blocks
+  # for each pixel, the scale and offset are averaged over all blocks in which that pixel is involved,
+  # so its value in L_eb is equivalent to the average of all mapped pixel values computed from different blocks
 
   #L_eb = block_mean + ratio * (L - block_mean)
   L_eb = cv2.filter2D(ratio, -1, normalised_kernel, anchor=anchor_after_flipped) * L + cv2.filter2D((1.0 - ratio) * block_mean, -1, normalised_kernel, anchor=anchor_after_flipped)
@@ -70,8 +76,8 @@ def process(Lab, block_size=25, epsilon=1e-2):
 
   ############## for ab ##############
 
-  # Temperarily shifting the value range of ab to [1, 255], so that the denominator, 
-  # which is defined as mean_a + mean_b, will not be 0
+  # Temperarily shifting the range of values for both a* and b* channel to [1, 255],
+  # so that the denominator, which is defined as mean_a + mean_b, will not be 0
   ab += 128.0
   mean_ab = np.mean(ab, axis=(0, 1))
   
@@ -84,7 +90,7 @@ def process(Lab, block_size=25, epsilon=1e-2):
   else:
     factor = np.zeros(2)
 
-  # The value range of ab is shifted back after compensation
+  # Applying the compensation and inverting the shifted range back to the original one
   ab += factor * ab - 128.0
 
   return np.concatenate((np.clip(L, 0, 100), np.clip(ab, -127, 127)), axis=-1)

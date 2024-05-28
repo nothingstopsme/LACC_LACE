@@ -3,13 +3,18 @@ import numpy as np
 
 def process(I, stop_criterion=1e-2, noise_kernel_size=25, noise_std=1.0):
   '''
-  I: the input image of which the channel format is normalsed RGB or normalised BGR, i.e. the range of channel values is [0.0, 1.0]
+  I:
+  The input image of which the channel format is normalsed RGB or normalised BGR,
+  i.e. the range of values for each channel is [0.0, 1.0].
 
-  stop_criterion: when the loss being minimised is less than or equal to this value, stop the iterative optimisation loop
+  stop_criterion:
+  When the loss being minimised is less than or equal to this value, stop the iterative optimisation loop.
 
-  noise_kernel_size: the size of the square gaussian kernel for blurring the input I
+  noise_kernel_size:
+  The size of the square gaussian kernel for blurring the input I.
 
-  noise_std: the standard deviation of the 2d isotropic gaussian distribution used for blurring the input I
+  noise_std:
+  The standard deviation of the 2d isotropic gaussian distribution used for blurring the input I.
 
   '''
 
