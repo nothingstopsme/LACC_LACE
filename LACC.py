@@ -20,9 +20,9 @@ def process(I, stop_criterion=1e-2, noise_kernel_size=25, noise_std=1.0):
 
   mean = np.mean(I, axis=(0, 1))
   order_indices = np.argsort(mean)
-  initial_mean_s = mean_s = mean[order_indices[0]]
-  initial_mean_m = mean_m = mean[order_indices[1]]
-  initial_mean_l = mean_l = mean[order_indices[2]]
+  mean_s = mean[order_indices[0]]
+  mean_m = mean[order_indices[1]]
+  mean_l = mean[order_indices[2]]
  
   I_copy = I.copy()
   # I_s/I_m/I_l are views of I_copy
@@ -32,15 +32,17 @@ def process(I, stop_criterion=1e-2, noise_kernel_size=25, noise_std=1.0):
 
   min_I_l = np.min(I_l)
   max_I_l = np.max(I_l)
-  I_l = (I_l - min_I_l) / (max_I_l - min_I_l)
-  mean_l = np.mean(I_l)
+  # Constraining the lower bound of the denominator to retain numerical stability
+  denominator = np.maximum(max_I_l - min_I_l, 1e-8)
+  I_l = (I_l - min_I_l) / denominator
+  mean_l = (mean_l - min_I_l) / denominator
 
-  # Minimising the loss function loss1 + loss2 by iteratively
+  # Minimising the loss function "loss1 + loss2" by iteratively
   # update I_s/mean_s and I_m/mean_m based on I_l/mean_l
   while True:
 
-    loss1 = np.abs(mean_l - mean_m)
     loss2 = np.abs(mean_l - mean_s)
+    loss1 = np.abs(mean_l - mean_m)
     #print(f'|loss| = {loss1 + loss2}')
     if loss1+loss2 <= stop_criterion:
       break

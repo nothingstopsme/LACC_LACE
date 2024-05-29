@@ -6,8 +6,8 @@ import LACC
 import LACE
 
 def main():
-  input_root_path = "input"
-  output_root_path = "output"
+  input_root_path = "images/before"
+  output_root_path = "images/after"
 
   os.makedirs(output_root_path, exist_ok=True)
   with os.scandir(input_root_path) as entries:
